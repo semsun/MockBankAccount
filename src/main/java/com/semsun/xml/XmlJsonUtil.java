@@ -14,6 +14,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXSource;
@@ -28,16 +29,16 @@ import com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver;
 
 public class XmlJsonUtil {
 	
-	public static String formatXml(String xml){
+	public static String formatXml(String xml, String encode){
       try{
          Transformer serializer= SAXTransformerFactory.newInstance().newTransformer();
 //         serializer.setOutputProperty(OutputKeys.INDENT, "yes");
 //         serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-         serializer.setOutputProperty("encoding", "GBK");
+         serializer.setOutputProperty(OutputKeys.ENCODING, encode);
          Source xmlSource=new SAXSource(new InputSource(new ByteArrayInputStream(xml.getBytes())));
          StreamResult res =  new StreamResult(new ByteArrayOutputStream());
          serializer.transform(xmlSource, res);
-         return new String(((ByteArrayOutputStream)res.getOutputStream()).toByteArray());
+         return new String(((ByteArrayOutputStream)res.getOutputStream()).toByteArray(), encode);
       }catch(Exception e){         
          return xml;
       }
@@ -78,7 +79,7 @@ public class XmlJsonUtil {
 		XStream tool = getXmlTool();
 		tool.processAnnotations(obj.getClass());
 		
-		return formatXml( tool.toXML(obj) );
+		return formatXml( tool.toXML(obj), "GBK" );
 	}
 	
 	public static String toJson(Object obj, Map<String, Class> alias) {
